@@ -1,0 +1,41 @@
+{
+    "name": "@enhanced-dom/react",
+    "version": "0.0.2",
+    "description": "Helpers for react",
+    "repository": "https://github.com/enhanced-dom/react.git",
+    "main": "index.js",
+    "scripts": {
+        "package": "cd dist && npm pack",
+        "prebuild": "rimraf dist/*",
+        "build": "tsc -p ./tsconfig.json",
+        "postbuild": "copyfiles package.json LICENSE.md README.md dist",
+        "lint": "eslint src/** --fix --config eslint.config.js"
+    },
+    "keywords": [],
+    "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
+    "license": "MIT",
+    "dependencies": {
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "@enhanced-dom/webcomponent": "^0.0.2",
+        "decamelize": "^5.0.0",
+        "lodash.omit": "^4.5.0",
+        "lodash.isplainobject": "^4.0.6"
+    },
+    "devDependencies": {
+        "@enhanced-dom/lint": "^0.0.3",
+        "copyfiles": "^2.4.1",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.2.2",
+        "@types/react": "^17.0.8",
+        "@types/react-dom": "^17.0.5",
+        "@types/decamelize": "^3.0.3",
+        "@types/lodash.isplainobject": "^4.0.6",
+        "@types/lodash.omit": "^4.5.6"
+
+    },
+    "engines": {
+        "node": ">=14.17.0",
+        "npm": ">=8.0.0"
+    }
+}
