@@ -121,12 +121,8 @@ withReactAdapter.defaultPropsTransformer = <
   ...rest
 }: ReactAttributesType) =>
   ({
-    class: className,
-    style: style
-      ? Object.keys(style)
-          .map((key) => `${decamelize(key, { separator: '-' })}: ${style[key]}`)
-          .join(';')
-      : undefined,
+    className,
+    style,
     ...Object.keys(rest).reduce(
       (seed, acc) => ({ ...seed, [acc]: Array.isArray(rest[acc]) || isPlainObject(rest[acc]) ? JSON.stringify(rest[acc]) : rest[acc] }),
       {} as Record<keyof ReactAttributesType, string>,
