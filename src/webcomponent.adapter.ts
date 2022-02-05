@@ -1,6 +1,5 @@
 import omit from 'lodash.omit'
 import React, { createElement, forwardRef, useEffect, useRef, useCallback } from 'react'
-import decamelize from 'decamelize'
 import isPlainObject from 'lodash.isplainobject'
 
 interface WebcomponentPrototype<WebcomponentElement extends HTMLElement, ConstructorArgsTypes extends any[] = any[]> {
@@ -51,7 +50,9 @@ export function withReactAdapter<
   eventMapping?: EventMapping
   propsTransformer?: (props: Partial<ReactAttributesType>) => ModifiedAttributesType
 }) {
-  window.customElements.define(name, type)
+  if (type) {
+    window.customElements.define(name, type)
+  }
   const WebcomponentWrapper = (props: ReactAttributesType, ref?: React.Ref<any>) => {
     const webComponentRef = useRef<any>()
     const isEvent = isEventEvaluator(eventMapping)
@@ -113,16 +114,18 @@ export function withReactAdapter<
 withReactAdapter.defaultEventMapping = (fromPropName: string) =>
   /on[A-Z]+/.test(fromPropName) ? fromPropName.substring(0, 2).toLowerCase() : null
 withReactAdapter.defaultPropsTransformer = <
-  ReactAttributesType extends { className?: string; style?: React.CSSProperties },
+  ReactAttributesType extends { className?: string; style?: React.CSSProperties; children?: React.ReactNode },
   ModifiedAttributesType = Record<string, string>,
 >({
   style,
   className,
+  children,
   ...rest
 }: ReactAttributesType) =>
   ({
     className,
     style,
+    children,
     ...Object.keys(rest).reduce(
       (seed, acc) => ({ ...seed, [acc]: Array.isArray(rest[acc]) || isPlainObject(rest[acc]) ? JSON.stringify(rest[acc]) : rest[acc] }),
       {} as Record<keyof ReactAttributesType, string>,
