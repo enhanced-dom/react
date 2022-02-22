@@ -112,7 +112,7 @@ export function withReactAdapter<
 }
 
 withReactAdapter.defaultEventMapping = (fromPropName: string) =>
-  /on[A-Z]+/.test(fromPropName) ? fromPropName.substring(0, 2).toLowerCase() : null
+  /on[A-Z]+/.test(fromPropName) ? fromPropName.substring(2).toLowerCase() : null
 withReactAdapter.defaultPropsTransformer = <
   ReactAttributesType extends { className?: string; style?: React.CSSProperties; children?: React.ReactNode },
   ModifiedAttributesType = Record<string, string>,
