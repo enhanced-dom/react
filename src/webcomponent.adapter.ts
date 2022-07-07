@@ -161,7 +161,14 @@ withReactAdapter.defaultPropsTransformer = <
     ...Object.keys(rest).reduce(
       (seed, acc) => ({
         ...seed,
-        [acc]: Array.isArray(rest[acc]) || isPlainObject(rest[acc]) || rest[acc] === null ? JSON.stringify(rest[acc]) : rest[acc],
+        [acc]:
+          Array.isArray(rest[acc]) || isPlainObject(rest[acc]) || rest[acc] === null
+            ? JSON.stringify(rest[acc])
+            : typeof rest[acc] === 'boolean'
+            ? rest[acc]
+              ? ''
+              : undefined
+            : rest[acc],
       }),
       {} as Record<keyof ReactAttributesType, string>,
     ),

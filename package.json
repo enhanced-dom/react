@@ -1,6 +1,6 @@
 {
     "name": "@enhanced-dom/react",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Helpers for react",
     "repository": "https://github.com/enhanced-dom/react.git",
     "main": "index.js",
