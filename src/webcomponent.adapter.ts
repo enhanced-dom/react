@@ -69,10 +69,18 @@ export function withReactAdapter<
   hoistedProps = ['renderer'] as StaticsType[],
   eventMapping = withReactAdapter.defaultEventMapping,
   propsTransformer = withReactAdapter.defaultPropsTransformer,
+  delegatedAttributeName = withReactAdapter.defaultDelegatedAttributeName,
+  delegatedAttributesSelector = withReactAdapter.defaultDelegatedAttributesSelector,
 }: {
   hoistedProps?: StaticsType[]
   eventMapping?: EventMapping
-  propsTransformer?: (props: Partial<ReactAttributesType>) => ModifiedAttributesType
+  propsTransformer?: (
+    props: Partial<ReactAttributesType>,
+    delegatedAttributeName?: string,
+    delegatedAttributesSelector?: (attributeName: string) => boolean,
+  ) => ModifiedAttributesType
+  delegatedAttributeName?: string
+  delegatedAttributesSelector?: (attributeName: string) => boolean
 } & (
   | {
       type: WebcomponentType
@@ -125,8 +133,7 @@ export function withReactAdapter<
 
     return createElement(elementTag, {
       ref: callbackRef,
-      ...forwardProps,
-      ...propsTransformer(forwardProps),
+      ...propsTransformer(forwardProps, delegatedAttributeName, delegatedAttributesSelector),
     })
   }
 
@@ -145,31 +152,47 @@ export function withReactAdapter<
 
 withReactAdapter.defaultEventMapping = (fromPropName: string) =>
   /on[A-Z]+/.test(fromPropName) ? fromPropName.substring(2).toLowerCase() : null
+withReactAdapter.defaultDelegatedAttributeName = 'delegated'
+withReactAdapter.defaultDelegatedAttributesSelector = () => false
 withReactAdapter.defaultPropsTransformer = <
   ReactAttributesType extends { className?: string; style?: React.CSSProperties; children?: React.ReactNode },
   ModifiedAttributesType = Record<string, string>,
->({
-  style,
-  className,
-  children,
-  ...rest
-}: ReactAttributesType) =>
-  ({
+>(
+  { style, className, children, ...rest }: ReactAttributesType,
+  delegatedAttributeName: string,
+  delegatedAttributesSelector: (attributeName: string) => boolean,
+) => {
+  const serializeAttribute = (value: any) => {
+    if (Array.isArray(value) || isPlainObject(value) || value === null) {
+      return JSON.stringify(value)
+    }
+    if (typeof value === 'boolean') {
+      return value ? '' : undefined
+    }
+    return value
+  }
+  const transformedAttributes = {
     className,
     style,
     children,
     ...Object.keys(rest).reduce(
       (seed, acc) => ({
         ...seed,
-        [acc]:
-          Array.isArray(rest[acc]) || isPlainObject(rest[acc]) || rest[acc] === null
-            ? JSON.stringify(rest[acc])
-            : typeof rest[acc] === 'boolean'
-            ? rest[acc]
-              ? ''
-              : undefined
-            : rest[acc],
+        [acc]: serializeAttribute(rest[acc]),
       }),
       {} as Record<keyof ReactAttributesType, string>,
     ),
-  } as unknown as ModifiedAttributesType)
+  } as unknown as ModifiedAttributesType
+  const attributesToForward = Object.keys(rest).filter(delegatedAttributesSelector)
+  attributesToForward.forEach((attributeName) => {
+    const dataForwardObject: Record<string, any> = transformedAttributes[delegatedAttributeName] ?? {}
+    dataForwardObject[attributeName] = transformedAttributes[attributeName]
+    delete transformedAttributes[attributeName]
+    transformedAttributes[delegatedAttributeName] = dataForwardObject
+  })
+  if (transformedAttributes[delegatedAttributeName]) {
+    transformedAttributes[delegatedAttributeName] = JSON.stringify(transformedAttributes[delegatedAttributeName])
+  }
+
+  return transformedAttributes
+}
