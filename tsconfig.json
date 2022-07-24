@@ -9,7 +9,10 @@
     "esModuleInterop": true,
     "outDir": "dist",
     "preserveConstEnums" : true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "sourceRoot": "./",
+    "inlineSources": true
   },
   "include": [
     "src/**/*.ts",
