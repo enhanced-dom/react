@@ -1,6 +1,6 @@
 import omit from 'lodash.omit'
 import pick from 'lodash.pick'
-import React, { createElement, forwardRef, useRef, useCallback, useMemo } from 'react'
+import React, { createElement, forwardRef, useRef, useCallback } from 'react'
 import isPlainObject from 'lodash.isplainobject'
 import { EventListenerTracker } from '@enhanced-dom/webcomponent'
 
@@ -96,19 +96,19 @@ export function withReactAdapter<
     }
 )) {
   const elementTag = type?.tag ?? tag
+  const mapEvent = eventMapper(eventMapping)
   const WebcomponentWrapper = (props: ReactAttributesType, ref?: React.MutableRefObject<any> | React.RefCallback<any>) => {
     ensureElementIsRegistered(elementTag, type)
     const webComponentRef = useRef<any>()
     const eventListenerRef = useRef<EventListenerTracker>(new EventListenerTracker())
     const isEvent = isEventEvaluator(eventMapping)
-    const mapEvent = useMemo(() => eventMapper(eventMapping), [eventMapping])
 
     const eventPropNames = Object.keys(props).filter((propName) => isEvent(propName))
     const eventProps = pick(props, eventPropNames)
     const cachedEventProps = useDynamicMemo(() => eventProps, eventProps)
     const findWebcomponent = useCallback(() => webComponentRef.current, [webComponentRef])
 
-    useNowEffect(() => {
+    const registerEventListener = useCallback(() => {
       eventListenerRef.current.unregister({ nodeLocator: findWebcomponent })
       eventListenerRef.current.register({
         hook: (e: Element) => {
@@ -124,7 +124,10 @@ export function withReactAdapter<
         },
         nodeLocator: findWebcomponent,
       })
-    }, [eventListenerRef, cachedEventProps, findWebcomponent, mapEvent])
+      eventListenerRef.current.refreshSubscriptions()
+    }, [eventListenerRef, cachedEventProps, findWebcomponent])
+
+    useNowEffect(registerEventListener)
 
     const callbackRef = useCallback(
       (node) => {

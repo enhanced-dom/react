@@ -1,6 +1,6 @@
 {
     "name": "@enhanced-dom/react",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "Helpers for react",
     "repository": "https://github.com/enhanced-dom/react.git",
     "main": "index.js",
@@ -18,7 +18,7 @@
     "dependencies": {
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "@enhanced-dom/webcomponent": "^0.0.8",
+        "@enhanced-dom/webcomponent": "^0.0.9",
         "lodash.omit": "^4.5.0",
         "lodash.pick": "^4.4.0",
         "lodash.isplainobject": "^4.0.6"
