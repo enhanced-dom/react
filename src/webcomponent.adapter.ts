@@ -2,7 +2,7 @@ import omit from 'lodash.omit'
 import pick from 'lodash.pick'
 import React, { createElement, forwardRef, useRef, useCallback } from 'react'
 import isPlainObject from 'lodash.isplainobject'
-import { EventListenerTracker } from '@enhanced-dom/webcomponent'
+import { EventListenerTracker } from '@enhanced-dom/dom'
 
 import { useDynamicMemo, useNowEffect } from './hooks'
 

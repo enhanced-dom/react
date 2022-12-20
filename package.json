@@ -1,41 +1,40 @@
 {
-    "name": "@enhanced-dom/react",
-    "version": "0.0.12",
-    "description": "Helpers for react",
-    "repository": "https://github.com/enhanced-dom/react.git",
-    "main": "index.js",
-    "scripts": {
-        "package": "cd dist && npm pack",
-        "prebuild": "rimraf dist/*",
-        "build": "tsc -p ./tsconfig.json",
-        "postbuild": "copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
-        "postinstall": "@enhanced-dom-husky",
-        "lint": "eslint src/** --fix --config eslint.config.js"
-    },
-    "keywords": [],
-    "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
-    "license": "MIT",
-    "dependencies": {
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2",
-        "@enhanced-dom/webcomponent": "^0.0.9",
-        "lodash.omit": "^4.5.0",
-        "lodash.pick": "^4.4.0",
-        "lodash.isplainobject": "^4.0.6"
-    },
-    "devDependencies": {
-        "@enhanced-dom/build": "^0.0.1",
-        "@enhanced-dom/lint": "^0.0.7",
-        "typescript": "^4.2.2",
-        "@types/react": "^17.0.8",
-        "@types/react-dom": "^17.0.5",
-        "@types/lodash.isplainobject": "^4.0.6",
-        "@types/lodash.omit": "^4.5.6",
-        "@types/lodash.pick": "^4.4.7"
-
-    },
-    "engines": {
-        "node": ">=14.17.0",
-        "npm": ">=8.0.0"
-    }
+  "name": "@enhanced-dom/react",
+  "version": "0.0.13",
+  "description": "Helpers for react",
+  "repository": "https://github.com/enhanced-dom/react.git",
+  "main": "index.js",
+  "scripts": {
+    "package": "cd dist && npm pack",
+    "prebuild": "rimraf dist/*",
+    "build": "tsc -p ./tsconfig.json",
+    "postbuild": "copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
+    "postinstall": "@enhanced-dom-husky",
+    "lint": "eslint src/** --fix --config eslint.config.js"
+  },
+  "keywords": [],
+  "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "@enhanced-dom/dom": "^0.0.1",
+    "lodash.omit": "^4.5.0",
+    "lodash.pick": "^4.4.0",
+    "lodash.isplainobject": "^4.0.6"
+  },
+  "devDependencies": {
+    "@enhanced-dom/build": "^0.0.2",
+    "@enhanced-dom/lint": "^0.0.7",
+    "typescript": "^4.2.2",
+    "@types/react": "^17.0.8",
+    "@types/react-dom": "^17.0.5",
+    "@types/lodash.isplainobject": "^4.0.6",
+    "@types/lodash.omit": "^4.5.6",
+    "@types/lodash.pick": "^4.4.7"
+  },
+  "engines": {
+    "node": ">=14.17.0",
+    "npm": ">=8.0.0"
+  }
 }
