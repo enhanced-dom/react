@@ -194,7 +194,7 @@ withReactAdapter.defaultPropsTransformer = <
     ...Object.keys(rest).reduce(
       (seed, acc) => ({
         ...seed,
-        [acc]: serializeAttribute(rest[acc]),
+        [acc]: acc === delegatedAttributeName ? rest[acc] : serializeAttribute(rest[acc]),
       }),
       {} as Record<keyof ReactAttributesType, string>,
     ),
