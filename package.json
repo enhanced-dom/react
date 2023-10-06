@@ -1,6 +1,6 @@
 {
   "name": "@enhanced-dom/react",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Helpers for react",
   "repository": "https://github.com/enhanced-dom/react.git",
   "main": "index.js",
@@ -16,16 +16,16 @@
   "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
   "license": "MIT",
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "@enhanced-dom/dom": "^0.0.3",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
-    "lodash.isplainobject": "^4.0.6"
+    "lodash.isplainobject": "^4.0.6",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "@enhanced-dom/build": "^0.0.2",
-    "@enhanced-dom/lint": "^0.0.7",
+    "@enhanced-dom/lint": "^0.0.9",
     "@types/lodash.isplainobject": "^4.0.6",
     "@types/lodash.omit": "^4.5.6",
     "@types/lodash.pick": "^4.4.7",

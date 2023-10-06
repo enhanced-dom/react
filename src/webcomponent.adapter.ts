@@ -63,8 +63,8 @@ export function withReactAdapter<
   WebcomponentElement extends HTMLElement,
   ConstructorArgsTypes extends any[],
   WebcomponentType extends WebcomponentPrototype<WebcomponentElement, ConstructorArgsTypes>,
-  ReactAttributesType extends { className?: string; style?: React.CSSProperties },
-  ModifiedAttributesType = Record<string, string>,
+  ReactComponentAttributesType extends { className?: string; style?: React.CSSProperties },
+  WebcomponentAttributesType extends { class?: string; style?: string } = { class?: string; style?: string },
   StaticsType extends string = 'renderer',
   ExtraStatics extends Record<string, any> = Record<string, AnalyserNode>,
 >({
@@ -79,10 +79,10 @@ export function withReactAdapter<
   hoistedProps?: StaticsType[]
   eventMapping?: EventMapping
   propsTransformer?: (
-    props: Partial<ReactAttributesType>,
+    props: Partial<ReactComponentAttributesType>,
     delegatedAttributeName?: string,
     delegatedAttributesSelector?: (attributeName: string) => boolean,
-  ) => ModifiedAttributesType
+  ) => WebcomponentAttributesType
   delegatedAttributeName?: string
   delegatedAttributesSelector?: (attributeName: string) => boolean
 } & (
@@ -97,7 +97,7 @@ export function withReactAdapter<
 )) {
   const elementTag = type?.tag ?? tag
   const mapEvent = eventMapper(eventMapping)
-  const WebcomponentWrapper = (props: ReactAttributesType, ref?: React.MutableRefObject<any> | React.RefCallback<any>) => {
+  const WebcomponentWrapper = (props: ReactComponentAttributesType, ref?: React.MutableRefObject<any> | React.RefCallback<any>) => {
     ensureElementIsRegistered(elementTag, type)
     const webComponentRef = useRef<any>()
     const eventListenerRef = useRef<EventListenerTracker>(new EventListenerTracker())
@@ -155,7 +155,7 @@ export function withReactAdapter<
 
   WebcomponentWrapper.displayName = `withReactAdapter<${elementTag}>`
 
-  const compWithForwardedRef = forwardRef(WebcomponentWrapper) as unknown as React.ComponentType<ReactAttributesType> &
+  const compWithForwardedRef = forwardRef(WebcomponentWrapper) as unknown as React.ComponentType<ReactComponentAttributesType> &
     CopiedStatics<WebcomponentElement, WebcomponentType, StaticsType> &
     ExtraStatics
   if (type) {
@@ -188,7 +188,7 @@ withReactAdapter.defaultPropsTransformer = <
     return value
   }
   const transformedAttributes = {
-    className,
+    class: className,
     style,
     children,
     ...Object.keys(rest).reduce(
