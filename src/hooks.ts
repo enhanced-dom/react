@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const useDynamicMemo = <ResultType>(fn: () => ResultType, deps: Record<string, any>) => {
   /* like useMemo, but the dependencies are an object instead of an array. The object is neglected (pointer-wise),
@@ -45,4 +45,20 @@ export const useIncrementalObjectDiff = (obj: Record<string, any>) => {
   }, Object.keys(oldObject.current))
   oldObject.current = obj
   return differentKeys
+}
+
+// inspired by https://usehooks.com/usedebounce
+export const useDebouncedMemo = <T>(value: T, delay: number) => {
+  /** like useMemo, but the value is returned after a certain delay */
+  const [currentValue, setCurrentValue] = useState(value)
+  const debounceCancelRef = useRef<() => void>()
+  useEffect(() => {
+    debounceCancelRef.current?.()
+    const timeout = setTimeout(() => setCurrentValue(value), delay)
+    debounceCancelRef.current = () => {
+      clearTimeout(timeout)
+    }
+    return debounceCancelRef.current
+  }, [value, delay, debounceCancelRef])
+  return currentValue
 }
