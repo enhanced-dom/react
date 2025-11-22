@@ -1,11 +1,12 @@
 import omit from 'lodash.omit'
 import pick from 'lodash.pick'
-import React, { createElement, forwardRef, useRef, useCallback } from 'react'
+import React, { createElement, forwardRef, useRef, useCallback, ForwardRefRenderFunction, PropsWithoutRef } from 'react'
 import isPlainObject from 'lodash.isplainobject'
 import { EventListenerTracker } from '@enhanced-dom/dom'
 
 import { useDynamicMemo, useNowEffect } from './hooks'
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 type WebcomponentPrototype<WebcomponentElement extends HTMLElement, ConstructorArgsTypes extends any[] = any[]> = {
   new (...args: ConstructorArgsTypes): WebcomponentElement
   renderer?: any
@@ -21,20 +22,20 @@ type WebcomponentPrototype<WebcomponentElement extends HTMLElement, ConstructorA
     }
 )
 
-type EventMapping = Record<string, string> | ((fromPropName: string) => string | null)
+type EventMappingType = Record<string, string> | ((fromPropName: string) => string | null)
 
-const eventMapper = (eventMapping: EventMapping) => (eventName?: string) => {
+const eventMapper = (eventMapping: EventMappingType) => (eventName?: string) => {
   if (typeof eventMapping === 'function') {
     return eventMapping(eventName)
   }
   return eventMapping[eventName]
 }
 
-const isEventEvaluator = (eventMapping: EventMapping) => (eventName?: string) => {
+const isEventEvaluator = (eventMapping: EventMappingType) => (eventName?: string) => {
   return !!eventMapper(eventMapping)(eventName)
 }
 
-type CopiedStatics<
+type CopiedStaticsType<
   WebcomponentElement extends HTMLElement,
   S extends WebcomponentPrototype<WebcomponentElement>,
   StaticsType extends string,
@@ -63,7 +64,7 @@ export function withReactAdapter<
   WebcomponentElement extends HTMLElement,
   ConstructorArgsTypes extends any[],
   WebcomponentType extends WebcomponentPrototype<WebcomponentElement, ConstructorArgsTypes>,
-  ReactComponentAttributesType extends { className?: string; style?: React.CSSProperties },
+  ReactComponentAttributesType extends PropsWithoutRef<{ className?: string; style?: React.CSSProperties }>,
   WebcomponentAttributesType extends { class?: string; style?: string } = { class?: string; style?: string },
   StaticsType extends string = 'renderer',
   ExtraStatics extends Record<string, any> = Record<string, AnalyserNode>,
@@ -77,9 +78,9 @@ export function withReactAdapter<
   delegatedAttributesSelector = withReactAdapter.defaultDelegatedAttributesSelector,
 }: {
   hoistedProps?: StaticsType[]
-  eventMapping?: EventMapping
+  eventMapping?: EventMappingType
   propsTransformer?: (
-    props: Partial<ReactComponentAttributesType>,
+    props: Partial<PropsWithoutRef<ReactComponentAttributesType>>,
     delegatedAttributeName?: string,
     delegatedAttributesSelector?: (attributeName: string) => boolean,
   ) => WebcomponentAttributesType
@@ -97,7 +98,10 @@ export function withReactAdapter<
 )) {
   const elementTag = type?.tag ?? tag
   const mapEvent = eventMapper(eventMapping)
-  const WebcomponentWrapper = (props: ReactComponentAttributesType, ref?: React.MutableRefObject<any> | React.RefCallback<any>) => {
+  const WebcomponentWrapper: ForwardRefRenderFunction<
+    React.MutableRefObject<any> | React.RefCallback<any>,
+    PropsWithoutRef<ReactComponentAttributesType>
+  > = (props, ref) => {
     ensureElementIsRegistered(elementTag, type)
     const webComponentRef = useRef<any>()
     const eventListenerRef = useRef<EventListenerTracker>(new EventListenerTracker())
@@ -147,6 +151,7 @@ export function withReactAdapter<
     )
 
     const forwardProps = omit(props, eventPropNames)
+    // eslint-disable-next-line react-hooks/refs
     return createElement(elementTag, {
       ref: callbackRef,
       ...propsTransformer(forwardProps, delegatedAttributeName, delegatedAttributesSelector),
@@ -156,7 +161,7 @@ export function withReactAdapter<
   WebcomponentWrapper.displayName = `withReactAdapter<${elementTag}>`
 
   const compWithForwardedRef = forwardRef(WebcomponentWrapper) as unknown as React.ComponentType<ReactComponentAttributesType> &
-    CopiedStatics<WebcomponentElement, WebcomponentType, StaticsType> &
+    CopiedStaticsType<WebcomponentElement, WebcomponentType, StaticsType> &
     ExtraStatics
   if (type) {
     hoistedProps.forEach((hoistedProp) => {

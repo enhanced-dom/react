@@ -1,3 +1,4 @@
+// TODO: when eslint plugin for refs (currently v7.0.0) gets 'fixed', these eslint-disable exceptions should be re-visited
 import { useEffect, useRef, useState } from 'react'
 
 export const useDynamicMemo = <ResultType>(fn: () => ResultType, deps: Record<string, any>) => {
@@ -7,19 +8,26 @@ export const useDynamicMemo = <ResultType>(fn: () => ResultType, deps: Record<st
   const resultRef = useRef<ResultType>(fn())
   const depsRef = useRef<Record<string, any>>({})
   const currentDepsFields = Object.keys(deps)
+  // eslint-disable-next-line react-hooks/refs
   const oldDepsFields = Object.keys(depsRef.current)
   if (currentDepsFields.length === oldDepsFields.length && currentDepsFields.every((f) => oldDepsFields.includes(f))) {
+    // eslint-disable-next-line react-hooks/refs
     if (currentDepsFields.every((f) => deps[f] === depsRef.current[f])) {
+      // eslint-disable-next-line react-hooks/refs
       return resultRef.current
     }
   }
+  // eslint-disable-next-line react-hooks/refs
   resultRef.current = fn()
+  // eslint-disable-next-line react-hooks/refs
   depsRef.current = deps
+  // eslint-disable-next-line react-hooks/refs
   return resultRef.current
 }
 
 export const useNowEffect = (fn: () => void, deps: any[] = []) => {
   const skipTrigger = useRef<boolean>(true)
+
   if (skipTrigger.current === true) {
     fn()
   }
@@ -30,11 +38,13 @@ export const useNowEffect = (fn: () => void, deps: any[] = []) => {
     } else {
       fn()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, skipTrigger, fn])
 }
 
 export const useIncrementalObjectDiff = (obj: Record<string, any>) => {
   const oldObject = useRef({})
+  // eslint-disable-next-line react-hooks/refs
   const differentKeys = Object.keys(obj).reduce((diffKeys, key) => {
     if (!diffKeys.includes(key)) {
       diffKeys = [...diffKeys, key]
@@ -42,7 +52,9 @@ export const useIncrementalObjectDiff = (obj: Record<string, any>) => {
       diffKeys = diffKeys.filter((k) => k !== key)
     }
     return diffKeys
+    // eslint-disable-next-line react-hooks/refs
   }, Object.keys(oldObject.current))
+  // eslint-disable-next-line react-hooks/refs
   oldObject.current = obj
   return differentKeys
 }
