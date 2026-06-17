@@ -1,7 +1,5 @@
-import omit from 'lodash.omit'
-import pick from 'lodash.pick'
+import { omit, pick, isPlainObject } from 'lodash-es'
 import React, { createElement, forwardRef, useRef, useCallback, ForwardRefRenderFunction, PropsWithoutRef } from 'react'
-import isPlainObject from 'lodash.isplainobject'
 import { EventListenerTracker } from '@enhanced-dom/dom'
 
 import { useDynamicMemo, useNowEffect } from './hooks'
@@ -24,14 +22,14 @@ type WebcomponentPrototype<WebcomponentElement extends HTMLElement, ConstructorA
 
 type EventMappingType = Record<string, string> | ((fromPropName: string) => string | null)
 
-const eventMapper = (eventMapping: EventMappingType) => (eventName?: string) => {
+const eventMapper = (eventMapping: EventMappingType) => (eventName: string) => {
   if (typeof eventMapping === 'function') {
     return eventMapping(eventName)
   }
   return eventMapping[eventName]
 }
 
-const isEventEvaluator = (eventMapping: EventMappingType) => (eventName?: string) => {
+const isEventEvaluator = (eventMapping: EventMappingType) => (eventName: string) => {
   return !!eventMapper(eventMapping)(eventName)
 }
 
@@ -93,7 +91,7 @@ export function withReactAdapter<
     }
   | {
       type?: WebcomponentType
-      tag: string
+      tag: NonNullable<string>
     }
 )) {
   const elementTag = type?.tag ?? tag
@@ -102,12 +100,11 @@ export function withReactAdapter<
     React.MutableRefObject<any> | React.RefCallback<any>,
     PropsWithoutRef<ReactComponentAttributesType>
   > = (props, ref) => {
-    ensureElementIsRegistered(elementTag, type)
     const webComponentRef = useRef<any>()
     const eventListenerRef = useRef<EventListenerTracker>(new EventListenerTracker())
     const isEvent = isEventEvaluator(eventMapping)
 
-    const eventPropNames = Object.keys(props).filter((propName) => isEvent(propName))
+    const eventPropNames = Object.keys(props).filter((propName) => isEvent(propName)) as (keyof typeof props)[]
     const eventProps = pick(props, eventPropNames)
     const cachedEventProps = useDynamicMemo(() => eventProps, eventProps)
     const findWebcomponent = useCallback(() => webComponentRef.current, [webComponentRef])
@@ -117,12 +114,18 @@ export function withReactAdapter<
       eventListenerRef.current.register({
         hook: (e: Element) => {
           Object.entries(cachedEventProps).forEach(([propName, eventHandler]) => {
-            e.addEventListener(mapEvent(propName), eventHandler)
+            const mappedEvent = mapEvent(propName)
+            if (mappedEvent) {
+              e.addEventListener(mappedEvent, eventHandler)
+            }
           })
 
           return (e1: Element) => {
             Object.entries(cachedEventProps).forEach(([propName, eventHandler]) => {
-              e1.removeEventListener(mapEvent(propName), eventHandler)
+              const mappedEvent = mapEvent(propName)
+              if (mappedEvent) {
+                e1.removeEventListener(mappedEvent, eventHandler)
+              }
             })
           }
         },
@@ -134,7 +137,7 @@ export function withReactAdapter<
     useNowEffect(registerEventListener)
 
     const callbackRef = useCallback(
-      (node) => {
+      (node: any) => {
         if (node !== null) {
           webComponentRef.current = node
           if (ref) {
@@ -150,8 +153,13 @@ export function withReactAdapter<
       [ref, webComponentRef, eventListenerRef],
     )
 
-    const forwardProps = omit(props, eventPropNames)
-    // eslint-disable-next-line react-hooks/refs
+    const forwardProps = omit(props, eventPropNames) as Partial<typeof props>
+
+    if (!elementTag) {
+      return null
+    }
+    ensureElementIsRegistered(elementTag, type)
+
     return createElement(elementTag, {
       ref: callbackRef,
       ...propsTransformer(forwardProps, delegatedAttributeName, delegatedAttributesSelector),
@@ -176,12 +184,12 @@ withReactAdapter.defaultEventMapping = (fromPropName: string) =>
 withReactAdapter.defaultDelegatedAttributeName = 'delegated'
 withReactAdapter.defaultDelegatedAttributesSelector = () => false
 withReactAdapter.defaultPropsTransformer = <
-  ReactAttributesType extends { className?: string; style?: React.CSSProperties; children?: React.ReactNode },
-  ModifiedAttributesType = Record<string, string>,
+  ReactAttributesType extends { className?: string; style?: React.CSSProperties; children?: React.ReactNode; [key: string]: unknown },
+  ModifiedAttributesType extends Record<string, unknown> = Record<string, unknown>,
 >(
   { style, className, children, ...rest }: ReactAttributesType,
-  delegatedAttributeName: string,
-  delegatedAttributesSelector: (attributeName: string) => boolean,
+  delegatedAttributeName?: string,
+  delegatedAttributesSelector?: (attributeName: string) => boolean,
 ) => {
   const serializeAttribute = (value: any) => {
     if (Array.isArray(value) || isPlainObject(value) || value === null) {
@@ -192,7 +200,7 @@ withReactAdapter.defaultPropsTransformer = <
     }
     return value
   }
-  const transformedAttributes = {
+  const transformedAttributes: Record<string, unknown> = {
     class: className,
     style,
     children,
@@ -203,8 +211,11 @@ withReactAdapter.defaultPropsTransformer = <
       }),
       {} as Record<keyof ReactAttributesType, string>,
     ),
-  } as unknown as ModifiedAttributesType
-  const attributesToForward = Object.keys(rest).filter(delegatedAttributesSelector)
+  }
+  const attributesToForward = delegatedAttributesSelector ? Object.keys(rest).filter(delegatedAttributesSelector) : Object.keys(rest)
+  if (!delegatedAttributeName) {
+    return transformedAttributes as ModifiedAttributesType
+  }
   attributesToForward.forEach((attributeName) => {
     const dataForwardObject: Record<string, any> = transformedAttributes[delegatedAttributeName] ?? {}
     dataForwardObject[attributeName] = transformedAttributes[attributeName]
@@ -215,5 +226,5 @@ withReactAdapter.defaultPropsTransformer = <
     transformedAttributes[delegatedAttributeName] = JSON.stringify(transformedAttributes[delegatedAttributeName])
   }
 
-  return transformedAttributes
+  return transformedAttributes as ModifiedAttributesType
 }

@@ -1,6 +1,6 @@
 {
   "name": "@enhanced-dom/react",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Helpers for react",
   "repository": "https://github.com/enhanced-dom/react.git",
   "main": "index.js",
@@ -10,27 +10,28 @@
     "build": "tsc -p ./tsconfig.json",
     "postbuild": "copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
     "postinstall": "@enhanced-dom-husky",
-    "lint": "eslint src/** --fix --config eslint.config.js"
+    "lint": "eslint src/** --fix --config eslint.config.cjs",
+    "test": "jest --config test/jest.config.cjs --runInBand"
   },
   "keywords": [],
   "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
   "license": "MIT",
   "dependencies": {
-    "@enhanced-dom/dom": "^0.2.1",
-    "lodash.omit": "^4.5.0",
-    "lodash.pick": "^4.4.0",
-    "lodash.isplainobject": "^4.0.6",
+    "@enhanced-dom/dom": "~0.3.0",
+    "lodash-es": "^4.18.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@enhanced-dom/build": "^0.2.0",
-    "@enhanced-dom/lint": "^0.2.1",
-    "@types/lodash.isplainobject": "^4.0.9",
-    "@types/lodash.omit": "^4.5.9",
-    "@types/lodash.pick": "^4.4.9",
+    "@enhanced-dom/lint": "~0.3.0",
+    "@enhanced-dom/jest": "~0.2.1",
+    "@enhanced-dom/webcomponent": "~0.4.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/jest": "^30.0.0",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
+    
     "typescript": "^5.9.3"
   },
   "engines": {
