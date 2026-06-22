@@ -1,5 +1,7 @@
 // TODO: when eslint plugin for refs (currently v7.0.0) gets 'fixed', these eslint-disable exceptions should be re-visited
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { debounce } from 'lodash-es'
+import type { DebouncedFunc, DebounceSettings } from 'lodash'
 
 export const useDynamicMemo = <ResultType>(fn: () => ResultType, deps: Record<string, any>) => {
   /* like useMemo, but the dependencies are an object instead of an array. The object is neglected (pointer-wise),
@@ -28,6 +30,7 @@ export const useDynamicMemo = <ResultType>(fn: () => ResultType, deps: Record<st
 export const useNowEffect = (fn: () => void, deps: any[] = []) => {
   const skipTrigger = useRef<boolean>(true)
 
+  // eslint-disable-next-line react-hooks/refs
   if (skipTrigger.current === true) {
     fn()
   }
@@ -73,4 +76,24 @@ export const useDebouncedMemo = <T>(value: T, delay: number) => {
     return debounceCancelRef.current
   }, [value, delay, debounceCancelRef])
   return currentValue
+}
+
+// inspired by https://usehooks-ts.com/react-hook/use-debounce-callback
+export const useDebouncedCallback = <T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number,
+  options?: DebounceSettings,
+): DebouncedFunc<T> => {
+  const fnRef = useRef(fn)
+  // eslint-disable-next-line react-hooks/refs
+  fnRef.current = fn
+  const { leading, trailing, maxWait } = options ?? {}
+  const debounced = useMemo(
+    // eslint-disable-next-line react-hooks/refs
+    () => debounce((...args: Parameters<T>) => fnRef.current(...args), delay, options),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [delay, leading, trailing, maxWait],
+  )
+  useEffect(() => () => debounced.cancel(), [fn, debounced])
+  return debounced
 }

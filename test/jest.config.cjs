@@ -4,4 +4,5 @@ const baseConfig = jestConfigFactory({ ts: true, processorConfigPath: path.join(
 module.exports = {
   ...baseConfig,
   transformIgnorePatterns: ['node_modules/(?!@enhanced-dom/|lodash-es)'],
+  setupFiles: ['<rootDir>/setup.ts'],
 }

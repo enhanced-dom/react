@@ -1,6 +1,6 @@
 {
   "name": "@enhanced-dom/react",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Helpers for react",
   "repository": "https://github.com/enhanced-dom/react.git",
   "main": "index.js",
@@ -24,14 +24,14 @@
   },
   "devDependencies": {
     "@enhanced-dom/build": "^0.2.0",
-    "@enhanced-dom/lint": "~0.3.0",
     "@enhanced-dom/jest": "~0.2.1",
+    "@enhanced-dom/lint": "~0.3.0",
     "@enhanced-dom/webcomponent": "~0.4.0",
-    "@types/lodash-es": "^4.17.12",
     "@types/jest": "^30.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.20.0",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
-    
     "typescript": "^5.9.3"
   },
   "engines": {
