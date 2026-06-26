@@ -12,8 +12,7 @@
     "preserveConstEnums" : true,
     "allowSyntheticDefaultImports": true,
     "noUncheckedIndexedAccess": true,
-    "sourceMap": true,
-    "sourceRoot": "./",
+    "inlineSourceMap": true,
     "inlineSources": true
   },
   "include": [

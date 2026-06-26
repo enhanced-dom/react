@@ -1,5 +1,5 @@
 // TODO: when eslint plugin for refs (currently v7.0.0) gets 'fixed', these eslint-disable exceptions should be re-visited
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { debounce } from 'lodash-es'
 import type { DebouncedFunc, DebounceSettings } from 'lodash'
 
@@ -96,4 +96,25 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(
   )
   useEffect(() => () => debounced.cancel(), [fn, debounced])
   return debounced
+}
+
+export const useObservedDimensions = (ref: RefObject<HTMLElement>) => {
+  const [dimensions, setDimensions] = useState<{ width?: number; height?: number }>({})
+
+  useEffect(() => {
+    if (ref.current) {
+      const observer = new ResizeObserver((observed) => {
+        window.requestAnimationFrame(() => {
+          setDimensions({ width: observed[0].contentRect.width, height: observed[0].contentRect.height })
+        })
+      })
+      const observedNode = ref.current
+      observer.observe(observedNode)
+      return () => {
+        observer.unobserve(observedNode)
+      }
+    }
+  }, [ref])
+
+  return dimensions
 }
