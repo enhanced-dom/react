@@ -58,7 +58,7 @@ export class TestWebComponent extends HTMLElement {
 
   render = debounce(
     () => {
-      TestWebComponent.renderer.render(this.shadowRoot, this._attributes)
+      TestWebComponent.renderer.render(this.shadowRoot!, this._attributes)
     },
     10,
     { leading: false, trailing: true },

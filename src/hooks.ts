@@ -46,7 +46,7 @@ export const useNowEffect = (fn: () => void, deps: any[] = []) => {
 }
 
 export const useIncrementalObjectDiff = (obj: Record<string, any>) => {
-  const oldObject = useRef({})
+  const oldObject = useRef<Record<string, any>>({})
   // eslint-disable-next-line react-hooks/refs
   const differentKeys = Object.keys(obj).reduce((diffKeys, key) => {
     if (!diffKeys.includes(key)) {
@@ -104,8 +104,12 @@ export const useObservedDimensions = (ref: RefObject<HTMLElement>) => {
   useEffect(() => {
     if (ref.current) {
       const observer = new ResizeObserver((observed) => {
+        const entry = observed[0]
+        if (!entry) {
+          return
+        }
         window.requestAnimationFrame(() => {
-          setDimensions({ width: observed[0].contentRect.width, height: observed[0].contentRect.height })
+          setDimensions({ width: entry.contentRect.width, height: entry.contentRect.height })
         })
       })
       const observedNode = ref.current
